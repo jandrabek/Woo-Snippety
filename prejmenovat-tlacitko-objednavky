@@ -1,0 +1,5 @@
+add_filter( 'woocommerce_order_button_text', 'wpblogcz_rename_place_order_button' );
+ 
+function wpblogcz_rename_place_order_button() {
+   return 'Chci objednat'; 
+}
