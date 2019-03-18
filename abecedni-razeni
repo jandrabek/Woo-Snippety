@@ -1,0 +1,7 @@
+add_filter( 'woocommerce_default_catalog_orderby_options', 'sort_by_title' );  // Add options to WooCommerce/Settings/Products/Display
+add_filter( 'woocommerce_catalog_orderby', 'sort_by_title' );  // Add options to sort dropdown on category page.
+function sort_by_title( $orderby_array ) {
+	$orderby_array[ 'title' ] = 'Seřadit podle názvu (A-Z)';
+	$orderby_array[ 'title-desc' ] = 'Seřadit podle názvu (Z-A)';
+	return $orderby_array;
+}
