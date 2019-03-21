@@ -1,0 +1,41 @@
+add_action( 'woocommerce_after_single_product_summary', 'custom_output_product_collection', 12 );
+function custom_output_product_collection(){
+
+    ## --- Základní nastavení --- ##
+
+    $attribute = "Série"; // <== Název atributy
+    $limit     = "3";     // <== Počet produktů
+    $cols      = "3";     // <== Počet sloupců
+    $orderby   = "rand";  // <== Řazení
+
+    ## --- Kód --- ##
+
+    global $post, $wpdb;
+
+    // Formátování vlastnosti
+    $attribute = sanitize_title( $attribute );
+    $taxonomy  = 'pa_' . $attribute;
+
+    // Získat produkty podle vlastnosti daného produktu
+    $terms = wp_get_post_terms( $post->ID, $taxonomy );
+    $term = reset($terms);
+
+    // Získat všechny produkty dané vlastnosti krom aktuální
+    $product_ids = $wpdb->get_col( "SELECT DISTINCT tr.object_id
+        FROM {$wpdb->prefix}term_relationships as tr
+        JOIN {$wpdb->prefix}term_taxonomy as tt ON tt.term_taxonomy_id = tr.term_taxonomy_id
+        JOIN {$wpdb->prefix}terms as t ON tt.term_id = t.term_id
+        WHERE tt.taxonomy LIKE '$taxonomy' AND t.term_id = '{$term->term_id}' AND tr.object_id != '{$post->ID}'" );
+
+    // Změnit hodnoty na řetězec oddělený čárkami
+    $ids = implode( ',', $product_ids );
+
+    ## --- Výstup --- ##
+
+    echo '<section class="'.$attribute.' '.$attribute.'-'.$term->slug.' products">
+        <h2>'.__( "Další ze série", "woocommerce" ).' '.$term->name.'</h2>';
+
+    echo do_shortcode("[products ids='$ids' columns='$cols' limit='$limit' orderby='$orderby']");
+
+    echo '</section>';
+}
